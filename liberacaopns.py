@@ -132,9 +132,5 @@ df_170e1 = df_vpm_actionlist_e170.merge(df_sap, on= 'FullPN_E1_170')
 # Filtro Teste
 df_170e1 = df_170e1 [df_170e1['FullPN_E1_170'] == '171-11116-401--/']
 
-# Export Teste
-df_170e1.to_csv('df_170e1.txt', sep=';')
 
-print(df_170e1)
-
-
+#etetetete
