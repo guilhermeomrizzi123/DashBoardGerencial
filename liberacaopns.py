@@ -67,7 +67,7 @@ df_sap['DOKVR'].replace('AZ','-AZ',inplace=True)
 df_sap['FullPN_E1_170']=df_sap.MFRPN.str.cat(df_sap['DOKVR'],'')
 
 # Remove colunas sem utilidade.
-df_sap = df_sap[['TIPO_DOC_GRD', 'NUM_DOC_GRD', 'FullPN_E1_170']]
+df_sap = df_sap[['TIPO_DOC_GRD', 'NUM_DOC_GRD', 'FullPN_E1_170', 'IND_STAT_PN','EXP_DATE','MATNR','DSC_MODIF']]
 
 
 
@@ -124,7 +124,7 @@ df_vpm_actionlist_e170['N_Revision_Letter'].replace('_-AI','-AI',inplace=True)
     # Concatenar PN com Letra de Revisão.
 df_vpm_actionlist_e170['FullPN_E1_170']=df_vpm_actionlist_e170.N_Action_Id.str.cat(df_vpm_actionlist_e170['N_Revision_Letter'],'')
 
-df_vpm_actionlist_e170 = df_vpm_actionlist_e170[['Action','FullPN_E1_170']]
+df_vpm_actionlist_e170 = df_vpm_actionlist_e170[['FullPN_E1_170']]
 
 # - -Junção 3DCOM E1-170 & SAP E1-170 - - - Junção 3DCOM E1-170 & SAP E1-170 - - - Junção 3DCOM E1-170 & SAP E1-170 - -
 df_170e1 = df_vpm_actionlist_e170.merge(df_sap, on= 'FullPN_E1_170')
