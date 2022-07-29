@@ -535,7 +535,7 @@ df_sap["DOKVR"].replace("SZ","-SZ",inplace=True)
 
 
     # Concatenar PN com Letra de Revisão.
-df_sap['FullPN_E1_170']=df_sap.MFRPN.str.cat(df_sap['DOKVR'],'')
+df_sap['FullPN']=df_sap.MFRPN.str.cat(df_sap['DOKVR'],'')
 
     # Renomear colunas.
 df_sap = df_sap.rename(columns={'TIPO_DOC_GRD':'DOCUMENTO_DE_MODIFICACAO'})
@@ -562,7 +562,7 @@ df_sap['DATA_PREVISTA_FORMATADA'] = pd.to_datetime(df_sap['DATA_PREVISTA'], form
 df_sap = df_sap[df_sap.STATUS_SAP_PN != 'CANC']
 
     # Remove colunas sem utilidade.
-df_sap = df_sap[['FullPN_E1_170', 'DOCUMENTO_DE_MODIFICACAO', 'NUMERO_DOCUMENTO_DE_MODIFICACAO', 'STATUS_SAP_PN', 'DATA_PREVISTA_FORMATADA']]
+df_sap = df_sap[['FullPN', 'DOCUMENTO_DE_MODIFICACAO', 'NUMERO_DOCUMENTO_DE_MODIFICACAO', 'STATUS_SAP_PN', 'DATA_PREVISTA_FORMATADA']]
 
     # Remover informações com data menor que 2015-01-01
 df_sap = df_sap[df_sap.DATA_PREVISTA_FORMATADA >= '2015-01-01']
@@ -573,7 +573,7 @@ df_sap  = df_sap.loc[(df_sap['NUMERO_DOCUMENTO_DE_MODIFICACAO'].str.startswith('
 
 
 
-df_sap.to_csv('df_e170_sap_full_organized.txt', sep=';')
+df_sap.to_csv('df_e170_sap_fullpn.txt', sep=';')
 
 
 
@@ -588,67 +588,67 @@ df_sap.to_csv('df_e170_sap_full_organized.txt', sep=';')
 df_e170_vpm = pd.read_csv(r'C:\Users\grizzi\05-PycharmProjects\LiberacaoPNs\ActionList170.txt', sep=' ', encoding='utf-8', low_memory=False)
 
     # Separar os dados contidos em uma única coluna.
-df_e170_vpm_visib_rel_split = df_e170_vpm['Action'].str.split()
+df_e170_vpm_split = df_e170_vpm['Action'].str.split()
 
     # Exportar a base organizada para um novo arquivo txt.
-df_e170_vpm_visib_rel_split.to_csv('df_splited_170.txt', sep=';')
+df_e170_vpm_split.to_csv('df_e170_splited.txt', sep=';')
 
     # Importar a base organizada.
-df_e170_vpm_reorganized = pd.read_csv(r'C:\Users\grizzi\05-PycharmProjects\LiberacaoPNs\df_splited_170.txt', sep=' ', encoding='utf-8', low_memory=False)
+df_e170_vpm_1 = pd.read_csv(r'C:\Users\grizzi\05-PycharmProjects\LiberacaoPNs\df_e170_splited.txt', sep=' ', encoding='utf-8', low_memory=False)
 
     # Renomear as colunas.
-df_e170_vpm_reorganized.columns = ['ID', 'Action Priority', 'Action Owner', 'Action Start Date', 'Action End Date', 'Action Status', 'Action Description', 'Action Type', 'Part Number', 'Part Instance', 'Part Conc Version', 'Part Version', 'Part Responsible', 'Part Org Responsible', 'Part Type', 'Part Origin', 'Part Design', 'Part Production', 'Irrelevante']
+df_e170_vpm_1.columns = ['Action Id', 'Action Priority', 'Action Owner', 'Action Start Date', 'Action End Date', 'Action Status', 'Action Description', 'Action Type', 'Part Number', 'Part Instance', 'Part Conc Version', 'Part Version', 'Part Responsible', 'Part Org Responsible', 'Part Type', 'Part Origin', 'Part Design', 'Part Production', 'Irrelevante']
 
     # Remover digitos sem utililidades nas colunas
-df_e170_vpm_reorganized['New_Part_Number_Adjust'] = df_e170_vpm_reorganized['Part Number'].str.replace("'", "")
+df_e170_vpm_1['Part Number'] = df_e170_vpm_1['Part Number'].str.replace("'", "")
 
-df_e170_vpm_reorganized['Action Owner'] = df_e170_vpm_reorganized['Action Owner'].str.replace("'", "")
-df_e170_vpm_reorganized['Action Owner'] = df_e170_vpm_reorganized['Action Owner'].str.replace(",", "")
+df_e170_vpm_1['Action Owner'] = df_e170_vpm_1['Action Owner'].str.replace("'", "")
+df_e170_vpm_1['Action Owner'] = df_e170_vpm_1['Action Owner'].str.replace(",", "")
 
-df_e170_vpm_reorganized['Action Start Date'] = df_e170_vpm_reorganized['Action Start Date'].str.replace("'", "")
-df_e170_vpm_reorganized['Action Start Date'] = df_e170_vpm_reorganized['Action Start Date'].str.replace(",", "")
+df_e170_vpm_1['Action Start Date'] = df_e170_vpm_1['Action Start Date'].str.replace("'", "")
+df_e170_vpm_1['Action Start Date'] = df_e170_vpm_1['Action Start Date'].str.replace(",", "")
 
-df_e170_vpm_reorganized['Action End Date'] = df_e170_vpm_reorganized['Action End Date'].str.replace("'", "")
-df_e170_vpm_reorganized['Action End Date'] = df_e170_vpm_reorganized['Action End Date'].str.replace(",", "")
+df_e170_vpm_1['Action End Date'] = df_e170_vpm_1['Action End Date'].str.replace("'", "")
+df_e170_vpm_1['Action End Date'] = df_e170_vpm_1['Action End Date'].str.replace(",", "")
 
-df_e170_vpm_reorganized['Action Status'] = df_e170_vpm_reorganized['Action Status'].str.replace("'", "")
-df_e170_vpm_reorganized['Action Status'] = df_e170_vpm_reorganized['Action Status'].str.replace(",", "")
+df_e170_vpm_1['Action Status'] = df_e170_vpm_1['Action Status'].str.replace("'", "")
+df_e170_vpm_1['Action Status'] = df_e170_vpm_1['Action Status'].str.replace(",", "")
 
-df_e170_vpm_reorganized['Action Description'] = df_e170_vpm_reorganized['Action Description'].str.replace("'", "")
-df_e170_vpm_reorganized['Action Description'] = df_e170_vpm_reorganized['Action Description'].str.replace(",", "")
+df_e170_vpm_1['Action Description'] = df_e170_vpm_1['Action Description'].str.replace("'", "")
+df_e170_vpm_1['Action Description'] = df_e170_vpm_1['Action Description'].str.replace(",", "")
 
-df_e170_vpm_reorganized['Action Type'] = df_e170_vpm_reorganized['Action Type'].str.replace("'", "")
-df_e170_vpm_reorganized['Action Type'] = df_e170_vpm_reorganized['Action Type'].str.replace(",", "")
+df_e170_vpm_1['Action Type'] = df_e170_vpm_1['Action Type'].str.replace("'", "")
+df_e170_vpm_1['Action Type'] = df_e170_vpm_1['Action Type'].str.replace(",", "")
 
-df_e170_vpm_reorganized['Part Responsible'] = df_e170_vpm_reorganized['Part Responsible'].str.replace("'", "")
-df_e170_vpm_reorganized['Part Responsible'] = df_e170_vpm_reorganized['Part Responsible'].str.replace(",", "")
+df_e170_vpm_1['Part Responsible'] = df_e170_vpm_1['Part Responsible'].str.replace("'", "")
+df_e170_vpm_1['Part Responsible'] = df_e170_vpm_1['Part Responsible'].str.replace(",", "")
 
-df_e170_vpm_reorganized['Part Org Responsible'] = df_e170_vpm_reorganized['Part Org Responsible'].str.replace("'", "")
-df_e170_vpm_reorganized['Part Org Responsible'] = df_e170_vpm_reorganized['Part Org Responsible'].str.replace(",", "")
+df_e170_vpm_1['Part Org Responsible'] = df_e170_vpm_1['Part Org Responsible'].str.replace("'", "")
+df_e170_vpm_1['Part Org Responsible'] = df_e170_vpm_1['Part Org Responsible'].str.replace(",", "")
 
-df_e170_vpm_reorganized['Action Owner'] = df_e170_vpm_reorganized['Action Owner'].str.replace("'", "")
-df_e170_vpm_reorganized['Action Owner'] = df_e170_vpm_reorganized['Action Owner'].str.replace(",", "")
+df_e170_vpm_1['Action Owner'] = df_e170_vpm_1['Action Owner'].str.replace("'", "")
+df_e170_vpm_1['Action Owner'] = df_e170_vpm_1['Action Owner'].str.replace(",", "")
 
-df_e170_vpm_reorganized['Part Design'] = df_e170_vpm_reorganized['Part Design'].str.replace("'", "")
-df_e170_vpm_reorganized['Part Design'] = df_e170_vpm_reorganized['Part Design'].str.replace(",", "")
+df_e170_vpm_1['Part Design'] = df_e170_vpm_1['Part Design'].str.replace("'", "")
+df_e170_vpm_1['Part Design'] = df_e170_vpm_1['Part Design'].str.replace(",", "")
 
     # Criar nova coluna com somente com a informação desejada.
-df_e170_vpm_reorganized['Correct_Part_Number'] = df_e170_vpm_reorganized['New_Part_Number_Adjust'].str.extract('(...-.....-...)', expand = True)
+df_e170_vpm_1['Correct_Part_Number'] = df_e170_vpm_1['Part Number'].str.extract('(...-.....-...)', expand = True)
 
     # Remover aspas na coluna Part Version.
-df_e170_vpm_reorganized['Revision_Letter_Adjust'] = df_e170_vpm_reorganized['Part Version'].str.replace("'", "")
+df_e170_vpm_1['Part Version'] = df_e170_vpm_1['Part Version'].str.replace("'", "")
 
     # Para separar letra de revisão.
-df_e170_vpm_reorganized['Correct_Revision_Letter'] = df_e170_vpm_reorganized['Revision_Letter_Adjust'].str.extract('(...)', expand = True)
+df_e170_vpm_1['Correct_Revision_Letter'] = df_e170_vpm_1['Part Version'].str.extract('(...)', expand = True)
 
     # Exportar planilha.
-df_e170_vpm_reorganized.to_csv('df_e170_vpm_reorganized.txt', sep=';')
+df_e170_vpm_1.to_csv('df_e170_vpm.txt', sep=';')
 
     # Importar planilha.
-df_e170_vpm_fullpn = pd.read_csv(r'C:\Users\grizzi\05-PycharmProjects\LiberacaoPNs\df_e170_vpm_reorganized.txt', sep=';', encoding='utf-8', low_memory=False)
+df_e170_vpm_fullpn = pd.read_csv(r'C:\Users\grizzi\05-PycharmProjects\LiberacaoPNs\df_e170_vpm.txt', sep=';', encoding='utf-8', low_memory=False)
 
     # Concatenar PN com Letra de Revisão.
-df_e170_vpm_fullpn['FullPN_E1_170']=df_e170_vpm_fullpn.Correct_Part_Number.str.cat(df_e170_vpm_fullpn['Correct_Revision_Letter'], '')
+df_e170_vpm_fullpn['FullPN']=df_e170_vpm_fullpn.Correct_Part_Number.str.cat(df_e170_vpm_fullpn['Correct_Revision_Letter'], '')
 
     # Renomear Colunas
 df_e170_vpm_fullpn = df_e170_vpm_fullpn.rename(columns={'Action Owner': 'ACTION_OWNER'})
@@ -657,10 +657,47 @@ df_e170_vpm_fullpn = df_e170_vpm_fullpn.rename(columns={'Action Status': 'STATUS
 
 
     # Selecionar somente colunas com dados relevantes.
-df_e170_vpm_fullpn = df_e170_vpm_fullpn[['FullPN_E1_170', 'RESPONSAVEL', 'STATUS_DA_ACTION', 'Action Start Date', 'Action End Date']]
+df_e170_vpm_fullpn = df_e170_vpm_fullpn[['FullPN', 'RESPONSAVEL', 'STATUS_DA_ACTION', 'Action Start Date', 'Action End Date']]
 
     # Exportar planilha.
-df_e170_vpm_fullpn.to_csv('df_e170_vpm_fullpn_organized.txt', sep=';')
+df_e170_vpm_fullpn.to_csv('df_e170_vpm_fullpn.txt', sep=';')
+
+
+
+
+
+
+
+
+
+#- - - - 3DCOM E1-190 - - - - - - - -- - - - - - - - 3DCOM E1-190 - - - - - - - -- - - - - - 3DCOM E1-190 - -
+
+    # Abrir a base de dados do 3DCOM (VPM_VISIB_REL-PART-E170ENG.csv)
+df_e190_vpm = pd.read_csv(r'C:\Users\grizzi\05-PycharmProjects\LiberacaoPNs\Preparacao\ActionList190.txt', sep=' ', encoding='utf-8')
+
+    # Separar os dados contidos em uma única coluna.
+df_e190_vpm = df_e190_vpm['Action'].str.split('\t', expand=True)
+
+    # Exportar a base organizada para um novo arquivo txt.
+df_e190_vpm.to_csv('df_e190_vpm.txt', sep=';')
+
+    # Renomear colunas.
+df2 = df_e190_vpm.rename(columns={0:'Action Id', 2:'Action Priority', 3:'Action Owner', 4:'Action Start Date', 5:'Action End Date', 6:'Action Status', 7:'Action Description', 8:'Action Type', 9:'Part Number', 10:'Part Instance', 11:'Part Conc Version', 12:'Part Version', 13:'Part Responsible', 14:'Part Org Responsible', 15:'Part Type', 16:'Part Origin', 17:'Part Design', 18:'Part Production', 19:'Irrelevante'})
+
+df2.to_csv('df2.txt', sep=';')
+
+print(df2)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -668,15 +705,14 @@ df_e170_vpm_fullpn.to_csv('df_e170_vpm_fullpn_organized.txt', sep=';')
 
 
 # - -Junção 3DCOM E1-170 & SAP E1-170 - - - Junção 3DCOM E1-170 & SAP E1-170 - - - Junção 3DCOM E1-170 & SAP E1-170 - -
-
     # Importar VPM reorganizado.
-df_e170_vpm_fullpn_organized = pd.read_csv(r'C:\Users\grizzi\05-PycharmProjects\LiberacaoPNs\df_e170_vpm_fullpn_organized.txt', sep=';', encoding='utf-8', low_memory=False)
+df_e170_vpm_fullpn_1 = pd.read_csv(r'C:\Users\grizzi\05-PycharmProjects\LiberacaoPNs\df_e170_vpm_fullpn.txt', sep=';', encoding='utf-8', low_memory=False)
 
     # Importar SAP reorganizado.
-df_e170_sap_fullpn_organized = pd.read_csv(r'C:\Users\grizzi\05-PycharmProjects\LiberacaoPNs\df_e170_sap_full_organized.txt', sep=';', encoding='utf-8', low_memory=False)
+df_e170_sap_fullpn_1 = pd.read_csv(r'C:\Users\grizzi\05-PycharmProjects\LiberacaoPNs\df_e170_sap_fullpn.txt', sep=';', encoding='utf-8', low_memory=False)
 
-    # Mesclar planilhas utilizando a coluna FullPN_E1_170 como referencia.
-df_170e1_vpm_x_sap = df_e170_vpm_fullpn_organized.merge(df_e170_sap_fullpn_organized, on='FullPN_E1_170')
+    # Mesclar planilhas utilizando a coluna FullPN como referencia.
+df_170e1_vpm_x_sap = df_e170_vpm_fullpn_1.merge(df_e170_sap_fullpn_1, on='FullPN')
 
 
 
@@ -707,6 +743,6 @@ df_170e1_vpm_x_sap = df_e170_vpm_fullpn_organized.merge(df_e170_sap_fullpn_organ
 #-------------FILTROS---------------------FILTROS---------------------FILTROS--------------------FILTROS---------------
 
     # Filtro curva de liberação.
-df_170e1_vpm_x_sap.to_csv('base completa.txt', sep=';')
+df_170e1_vpm_x_sap.to_csv('df_VPM&SAP.txt', sep=';')
 
 
