@@ -1,5 +1,6 @@
 import pandas as pd
 from datetime import date
+from datetime import timedelta
 
 # - - - - - - - - SAP E1-170 - - - - - - - - -- - - - - - - - SAP E1-170 - - - - - - - - -- - - - - - - - SAP E1-170 -
     # Função para organizar o cabeçalho e permitir a leitura do txt.
@@ -564,18 +565,14 @@ df_sap = df_sap[df_sap.STATUS_SAP_PN != 'CANC']
     # Remove colunas sem utilidade.
 df_sap = df_sap[['FullPN', 'DOCUMENTO_DE_MODIFICACAO', 'NUMERO_DOCUMENTO_DE_MODIFICACAO', 'STATUS_SAP_PN', 'DATA_PREVISTA_FORMATADA']]
 
-    # Remover informações com data menor que 2015-01-01
+    # Remover informações com data menor que 2015-01-01.
 df_sap = df_sap[df_sap.DATA_PREVISTA_FORMATADA >= '2015-01-01']
 
-    # Filtra OE com iniciais 145, 170, 190
-df_sap  = df_sap.loc[(df_sap['NUMERO_DOCUMENTO_DE_MODIFICACAO'].str.startswith('145', na=False))|(df_sap['NUMERO_DOCUMENTO_DE_MODIFICACAO'].str.startswith('170', na=False))|(df_sap['NUMERO_DOCUMENTO_DE_MODIFICACAO'].str.startswith('190', na=False))]
+    # Filtra OE com iniciais 170, 190.
+df_sap  = df_sap.loc[(df_sap['NUMERO_DOCUMENTO_DE_MODIFICACAO'].str.startswith('170', na=False))|(df_sap['NUMERO_DOCUMENTO_DE_MODIFICACAO'].str.startswith('190', na=False))]
 
-
-
-
-df_sap.to_csv('df_e170_sap_fullpn.txt', sep=';')
-
-
+    # Exportar planilha SAP.
+df_sap.to_csv('df_sap_fullpn.txt', sep=';')
 
 
 
@@ -654,10 +651,11 @@ df_e170_vpm_fullpn['FullPN']=df_e170_vpm_fullpn.Correct_Part_Number.str.cat(df_e
 df_e170_vpm_fullpn = df_e170_vpm_fullpn.rename(columns={'Action Owner': 'ACTION_OWNER'})
 df_e170_vpm_fullpn = df_e170_vpm_fullpn.rename(columns={'Part Responsible': 'RESPONSAVEL'})
 df_e170_vpm_fullpn = df_e170_vpm_fullpn.rename(columns={'Action Status': 'STATUS_DA_ACTION'})
+df_e170_vpm_fullpn = df_e170_vpm_fullpn.rename(columns={'Part Org Responsible': 'TECNOLOGIA'})
 
 
     # Selecionar somente colunas com dados relevantes.
-df_e170_vpm_fullpn = df_e170_vpm_fullpn[['FullPN', 'RESPONSAVEL', 'STATUS_DA_ACTION', 'Action Start Date', 'Action End Date']]
+df_e170_vpm_fullpn = df_e170_vpm_fullpn[['FullPN', 'RESPONSAVEL', 'STATUS_DA_ACTION', 'Action Start Date', 'Action End Date', 'TECNOLOGIA']]
 
     # Exportar planilha.
 df_e170_vpm_fullpn.to_csv('df_e170_vpm_fullpn.txt', sep=';')
@@ -668,25 +666,34 @@ df_e170_vpm_fullpn.to_csv('df_e170_vpm_fullpn.txt', sep=';')
 
 
 
-
-
 #- - - - 3DCOM E1-190 - - - - - - - -- - - - - - - - 3DCOM E1-190 - - - - - - - -- - - - - - 3DCOM E1-190 - -
 
     # Abrir a base de dados do 3DCOM (VPM_VISIB_REL-PART-E170ENG.csv)
-df_e190_vpm = pd.read_csv(r'C:\Users\grizzi\05-PycharmProjects\LiberacaoPNs\Preparacao\ActionList190.txt', sep=' ', encoding='utf-8')
+df_e190_vpm = pd.read_csv(r'C:\Users\grizzi\05-PycharmProjects\LiberacaoPNs\ActionList190.txt', sep=' ', encoding='utf-8')
 
     # Separar os dados contidos em uma única coluna.
 df_e190_vpm = df_e190_vpm['Action'].str.split('\t', expand=True)
 
-    # Exportar a base organizada para um novo arquivo txt.
-df_e190_vpm.to_csv('df_e190_vpm.txt', sep=';')
-
     # Renomear colunas.
-df2 = df_e190_vpm.rename(columns={0:'Action Id', 2:'Action Priority', 3:'Action Owner', 4:'Action Start Date', 5:'Action End Date', 6:'Action Status', 7:'Action Description', 8:'Action Type', 9:'Part Number', 10:'Part Instance', 11:'Part Conc Version', 12:'Part Version', 13:'Part Responsible', 14:'Part Org Responsible', 15:'Part Type', 16:'Part Origin', 17:'Part Design', 18:'Part Production', 19:'Irrelevante'})
+df_e190_vpm = df_e190_vpm.rename(columns={0:'Action Id', 1:'Action Priority', 2:'Action Owner', 3:'Action Start Date', 4:'Action End Date', 5:'Action Status', 6:'Action Description', 7:'Action Type', 8:'Part Number', 9:'Part Instance', 10:'Part Conc Version', 11:'Part Version', 12:'Part Responsible', 13:'Part Org Responsible', 14:'Part Type', 15:'Part Origin', 16:'Part Design', 17:'Part Production', 18:'Irrelevante'})
 
-df2.to_csv('df2.txt', sep=';')
+    # Criar nova coluna com somente com a informação desejada.
+df_e190_vpm['Correct_Part_Number'] = df_e190_vpm['Part Number'].str.extract('(...-.....-...)', expand = True)
 
-print(df2)
+    # Concatenar PN com Letra de Revisão.
+df_e190_vpm['FullPN']=df_e190_vpm.Correct_Part_Number.str.cat(df_e190_vpm['Part Version'], '')
+
+    # Renomear Colunas
+df_e190_vpm = df_e190_vpm.rename(columns={'Action Owner': 'ACTION_OWNER'})
+df_e190_vpm = df_e190_vpm.rename(columns={'Part Responsible': 'RESPONSAVEL'})
+df_e190_vpm = df_e190_vpm.rename(columns={'Action Status': 'STATUS_DA_ACTION'})
+df_e190_vpm = df_e190_vpm.rename(columns={'Part Org Responsible': 'TECNOLOGIA'})
+
+    # Selecionar somente colunas com dados relevantes.
+df_e190_vpm = df_e190_vpm[['FullPN', 'RESPONSAVEL', 'STATUS_DA_ACTION', 'Action Start Date', 'Action End Date', 'TECNOLOGIA']]
+
+    # Exportar base vpm.
+df_e190_vpm.to_csv('df_e190_vpm_fullpn.txt', sep=';')
 
 
 
@@ -696,42 +703,63 @@ print(df2)
 
 
 
-
-
-
-
-
-
-
-
-# - -Junção 3DCOM E1-170 & SAP E1-170 - - - Junção 3DCOM E1-170 & SAP E1-170 - - - Junção 3DCOM E1-170 & SAP E1-170 - -
-    # Importar VPM reorganizado.
+# - -Junção VPM & SAP - - - - - - - - -Junção VPM & SAP - - - - - - - - -Junção VPM & SAP - - - - - - - - -Junção VPM & SAP - - - - - - -
+    # Importar VPM e170 reorganizado.
 df_e170_vpm_fullpn_1 = pd.read_csv(r'C:\Users\grizzi\05-PycharmProjects\LiberacaoPNs\df_e170_vpm_fullpn.txt', sep=';', encoding='utf-8', low_memory=False)
 
-    # Importar SAP reorganizado.
-df_e170_sap_fullpn_1 = pd.read_csv(r'C:\Users\grizzi\05-PycharmProjects\LiberacaoPNs\df_e170_sap_fullpn.txt', sep=';', encoding='utf-8', low_memory=False)
+    # Importar VPM e190 reorganizado.
+df_e190_vpm_fullpn_1 = pd.read_csv(r'C:\Users\grizzi\05-PycharmProjects\LiberacaoPNs\df_e190_vpm_fullpn.txt', sep=';', encoding='utf-8', low_memory=False)
 
-    # Mesclar planilhas utilizando a coluna FullPN como referencia.
-df_170e1_vpm_x_sap = df_e170_vpm_fullpn_1.merge(df_e170_sap_fullpn_1, on='FullPN')
+    # Importar SAP e170 reorganizado.
+df_sap_fullpn_1 = pd.read_csv(r'C:\Users\grizzi\05-PycharmProjects\LiberacaoPNs\df_sap_fullpn.txt', sep=';', encoding='utf-8', low_memory=False)
 
+    # Append vpm e170 com e190
+df_vpm_append = df_e170_vpm_fullpn_1.append(df_e190_vpm_fullpn_1, sort=True)
 
+    # Exportar append vpm e170 + e190
+df_vpm_append.to_csv('df_vpm_append.txt', sep=';')
 
-
-
-
-# - - Merge com a base Nome dos Responsáveis - - - - - - - Merge com a base Nome dos Responsáveis  - - - -  - - - -  -
-
-
-
-
+    # Mesclar VPM com SAP
+df_vpm_x_sap = pd.merge(df_sap_fullpn_1, df_vpm_append, how="left", on=['FullPN'])
 
 
+#df_merge_TESTE = pd.merge(df_sap_fullpn_1, df_vpm_append, how="left", on=['FullPN'])
+#df_merge_TESTE.to_csv('mergeTESTE.txt', sep=';')
+
+    # Exportar VPM x SAP
+    # Planilha com a Junção do SAP e VPM (E170 e E190)
+df_vpm_x_sap.to_csv('df_vpm_x_sap.txt', sep=';')
 
 
 
 
-# - - Remover Duplicatas - - - - - - - Remover Duplicatas - - - - - - - Remover Duplicatas - - - - - - - Remover Du----
 
+
+
+# - - TRATAR VPM + SAP - - TRATAR VPM + SAP - - TRATAR VPM + SAP - - TRATAR VPM + SAP - - TRATAR VPM + SAP
+
+    # Importar.
+df_vpm_x_sap_1 = pd.read_csv(r'C:\Users\grizzi\05-PycharmProjects\LiberacaoPNs\df_vpm_x_sap.txt', sep=';', encoding='utf-8', low_memory=False)
+
+    # Remover Duplicatas.
+df_vpm_x_sap_1 = df_vpm_x_sap_1.drop_duplicates(subset='FullPN', keep='first')
+
+    # Remover linhas sem informação de PN.
+df_vpm_x_sap_1 = df_vpm_x_sap_1.dropna(subset=['FullPN'])
+
+    # Importar df com o nome dos usuários.
+df_vpm_user = pd.read_csv(r'C:\Users\grizzi\05-PycharmProjects\LiberacaoPNs\VPM_VISIB_REL-PERSON-prd170.csv', sep=';', encoding='utf-8', low_memory=False)
+
+    # Alterar o nome da Coluna PERSON ID para RESPONSAVEL
+df_vpm_user = df_vpm_user.rename(columns={'PERSON ID': 'RESPONSAVEL'})
+
+    # Mesclar para adicionar o nome dos usuarios ao invés de role.
+df_vpm_x_sap_2 = df_vpm_x_sap_1.merge(df_vpm_user, on='RESPONSAVEL')
+
+    # Remover colunas sem utilidade.
+df_vpm_x_sap_2 = df_vpm_x_sap_2.drop(columns=['Unnamed: 0', 'Unnamed: 0_x', 'Unnamed: 0_y', 'Organization', 'First Name', 'Phone Number', 'Area'])
+
+df_vpm_x_sap_2.to_csv('df_vpm_x_sap_2.txt', sep=';')
 
 
 
@@ -742,7 +770,45 @@ df_170e1_vpm_x_sap = df_e170_vpm_fullpn_1.merge(df_e170_sap_fullpn_1, on='FullPN
 
 #-------------FILTROS---------------------FILTROS---------------------FILTROS--------------------FILTROS---------------
 
-    # Filtro curva de liberação.
-df_170e1_vpm_x_sap.to_csv('df_VPM&SAP.txt', sep=';')
+    # Importar planilha VPM x SAP
+df_vpm_x_sap_3 = pd.read_csv(r'C:\Users\grizzi\05-PycharmProjects\LiberacaoPNs\df_vpm_x_sap_2.txt', sep=';', encoding='utf-8', low_memory=False)
 
+    # Alterar data para DateTime
+df_vpm_x_sap_3['DATA_OE'] = pd.to_datetime(df_vpm_x_sap_3['DATA_PREVISTA_FORMATADA']).dt.date
+df_vpm_x_sap_3['DATA_OE'] = pd.to_datetime(df_vpm_x_sap_3['DATA_PREVISTA_FORMATADA'])
 
+    # TODO Comparar conteúdo da planilha do SAP x VPM para verificar PNs para liberar sem action enviada.
+
+df_sap_fullpn_2 = pd.read_csv(r'C:\Users\grizzi\05-PycharmProjects\LiberacaoPNs\df_sap_fullpn.txt', sep=';')
+df_vpm_append_1 = pd.read_csv(r'C:\Users\grizzi\05-PycharmProjects\LiberacaoPNs\df_vpm_append.txt', sep=';')
+
+compare_teste = df_sap_fullpn_2.merge(df_vpm_append_1, on='FullPN')
+
+compare_teste.to_csv('compare_teste.txt', sep=';')
+
+    # PNs para liberar nos próximos 2 dias em action.
+today = pd.datetime.today().date()
+end_date_2d = pd.datetime.today()+timedelta(days=2)
+gr_pn_next_2d = df_vpm_x_sap_3[(df_vpm_x_sap_3['DATA_OE'] >= today) & (df_vpm_x_sap_3['DATA_OE'] < end_date_2d)]
+
+gr_pn_next_2d.to_csv('gr_pn_next_2d.txt', sep=';')
+
+    # TODO PNs para liberar nos próximos 2 dias sem action.
+
+    # PNs para liberar nos próximos 15 dias em action.
+today = pd.datetime.today().date()
+end_date_15d = pd.datetime.today()+timedelta(days=15)
+gr_pn_next_15d = df_vpm_x_sap_3[(df_vpm_x_sap_3['DATA_OE'] >= today) & (df_vpm_x_sap_3['DATA_OE'] < end_date_15d)]
+
+gr_pn_next_15d.to_csv('gr_pn_next_15d.txt', sep=';')
+
+    # TODO PNs para liberar nos próximos 15 dias sem action.
+
+    # PNs para liberar nos próximos 30 dias em action.
+today = pd.datetime.today().date()
+end_date_30d = pd.datetime.today()+timedelta(days=30)
+gr_pn_next_30d = df_vpm_x_sap_3[(df_vpm_x_sap_3['DATA_OE'] >= today) & (df_vpm_x_sap_3['DATA_OE'] < end_date_30d)]
+
+gr_pn_next_30d.to_csv('gr_pn_next_30d.txt', sep=';')
+
+    # TODO PNs para liberar nos próximos 30 dias sem action.
